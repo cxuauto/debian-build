@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: 
+      image: debian:12
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y libopencv-dev git cmake make
+
+      - name: Clone tengine-lite-yolov5s-tt100k repo and build
+        run: |
+          git clone https://github.com/Truoji/tengine-lite-yolov5s-tt100k
+          cd tengine-lite-yolov5s-tt100k
+          cp /content/libtengine-lite-static.a third_party/
+          sed -i 's/SHARED/STATIC/g' CMakeLists.txt
+          sed -i 's/libtengine-lite.so/libtengine-lite-static.a/g' CMakeLists.txt
+          mkdir -p build && cd build && rm -f CMakeCache.txt && cmake .. && make
+
+      - name: Upload build artifacts to GitHub Release
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: tengine-lite-yolov5s-tt100k/build/yolov5s-tt100k
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload build artifacts to GitHub Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./tengine-lite-yolov5s-tt100k/build/yolov5s-tt100k
+          asset_name: yolov5s-tt100k
+          asset_content_type: application/octet-stream
