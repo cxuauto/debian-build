@@ -28,6 +28,8 @@ jobs:
           cd tengine-lite-yolov5s-tt100k
           sed -i 's/SHARED/STATIC/g' CMakeLists.txt
           sed -i 's/libtengine-lite.so/libtengine-lite-static.a/g' CMakeLists.txt
+          sed -i '/find_package(OpenCV REQUIRED)/a find_package(OpenMP REQUIRED)' CMakeLists.txt
+          sed -i 's/target_link_libraries(yolov5s-tt100k tengine ${OpenCV_LIBS})/target_link_libraries(yolov5s-tt100k tengine OpenMP::OpenMP_CXX ${OpenCV_LIBS})/' CMakeLists.txt
           mkdir -p build && cd build && rm -f CMakeCache.txt && cmake .. && make
 
       - name: Upload build artifacts to GitHub Release
