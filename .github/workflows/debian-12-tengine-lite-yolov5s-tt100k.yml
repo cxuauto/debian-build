@@ -38,23 +38,16 @@ jobs:
           name: build
           path: tengine-lite-yolov5s-tt100k/build/yolov5s-tt100k
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+      - name: Gets latest created release info
+        id: latest_release_info
+        uses: jossef/action-latest-release-info@v1.2.2
 
       - name: Upload build artifacts to GitHub Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
           asset_path: ./tengine-lite-yolov5s-tt100k/build/yolov5s-tt100k
           asset_name: yolov5s-tt100k
           asset_content_type: application/octet-stream
