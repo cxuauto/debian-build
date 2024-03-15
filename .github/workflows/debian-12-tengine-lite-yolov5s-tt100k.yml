@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y libopencv-dev git cmake make
+          apt-get install -y libopencv-dev git cmake build-essential
 
       - name: Clone tengine-lite-yolov5s-tt100k repo and build
         run: |
