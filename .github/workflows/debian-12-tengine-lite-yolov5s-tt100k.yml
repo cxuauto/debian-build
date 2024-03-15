@@ -26,7 +26,6 @@ jobs:
         run: |
           git clone https://github.com/Truoji/tengine-lite-yolov5s-tt100k
           cd tengine-lite-yolov5s-tt100k
-          cp /content/libtengine-lite-static.a third_party/
           sed -i 's/SHARED/STATIC/g' CMakeLists.txt
           sed -i 's/libtengine-lite.so/libtengine-lite-static.a/g' CMakeLists.txt
           mkdir -p build && cd build && rm -f CMakeCache.txt && cmake .. && make
